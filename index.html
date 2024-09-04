@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/particle-api-js@8/dist/particle.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.15.2/js/all.js" data-auto-a11y="true" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.0/d3.min.js" defer></script>
+
+    <style>
+        body {
+            gap: 2em;
+            transition: .2s ease-in-out background;
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #switch {
+            width: 90px;
+            height: 50px;
+            border-radius: 50px;
+            border: 1px solid;
+            background: whitesmoke;
+            border-color: lightgray;
+        }
+
+        #switch::before {
+            transition: .1s ease margin-left;
+            content: '';
+            display: block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50px;
+            background-color: gray;
+            margin: 5px;
+        }
+
+        svg.svg-inline--fa { color: darkslategray }
+        body.on svg.svg-inline--fa { color: whitesmoke }
+
+        body.on { background-color: black }
+
+        body.on #switch {
+            background: darkslategrey;
+            border-color: gray;
+        }
+
+        body.on #switch::before {
+            margin-left: auto;
+            background-color: slategrey;
+        }
+    </style>
+</head>
+
+<body>
+    <i id="moon" class="fa fa-3x fa-moon" style="display: none"></i>
+    <i id="sun" class="fa fa-3x fa-sun"></i>
+    <div id="switch"></div>
+
+
+    <script defer>
+        let particle = new Particle();
+        const toggle = document.getElementById("switch");
+        let isOn = false;
+
+        async function init() {
+            const response = await particle.login({ username: 'bgutierrez14@ucol.mx', password: 'lucas_10' });
+            if (response.statusCode != 200) return alert("No se puede conectar");
+            const token = response.body.access_token;
+            toggle.addEventListener("click", async () => {
+                isOn = document.body.classList.toggle("on");
+                document.getElementById("sun").style = isOn? "display: none" : "";
+                document.getElementById("moon").style = !isOn? "display: none" : "";
+
+                await particle.callFunction({
+                    deviceId: '340017000947313037363132',
+                    name: 'led',
+                    argument: isOn? '1' : '0',
+                    auth: token
+                });
+            });
+        }
+
+        init();
+    </script>
+
+</body>
+
+</html>
