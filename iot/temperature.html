@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperatura</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/particle-api-js@8/dist/particle.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.15.2/js/all.js" data-auto-a11y="true" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.0/d3.min.js" defer></script>
+</head>
+
+<body>
+    <div class="temp-container">
+        <h1 id="temp">0.0 C</h1>
+        <i class="fa-solid fa-temperature-empty"></i>
+    </div>
+
+    <div class="hum-container">
+        <h1 id="hum">0%</h1>
+        <i class="fa-solid fa-droplet"></i>
+    </div>
+
+    <script defer>
+        let particle = new Particle();
+        const temp = document.getElementById("temp");
+        const hum = document.getElementById("hum");
+
+        async function init() {
+            const tokenReq = await particle.login({username: "bgutierrez14@ucol.mx", password: "lucas_10"});
+            if (tokenReq.statusCode != 200) return alert("No se pudo conectar");
+            const token = tokenReq.body.access_token;
+
+            setInterval(async () => {
+                const tempQuery = await particle.getVariable({ deviceId: '340017000947313037363132', name: 'TEMP', auth: token });
+                const humQuery = await particle.getVariable({ deviceId: '340017000947313037363132', name: 'HUM', auth: token });
+                console.log("A");
+                temp.innerText = (tempQuery.statusCode == 200? tempQuery.body.result.toFixed(2) : '--') + ' C';
+                hum.innerText = (humQuery.statusCode == 200? humQuery.body.result.toFixed(2) : '--') + '%';
+            }, 1000);
+        }
+
+        init();
+    </script>
+
+    <style>
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+    </style>
+</body>
